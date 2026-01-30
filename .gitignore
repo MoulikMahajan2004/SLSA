@@ -1,0 +1,17 @@
+# **/.terraform/
+# *.exe
+# *.tfstate
+#*.tfstate.*
+# *.tfplan
+# tfplan.json
+# crash.log
+# crash.*.log
+# *.terraform.lock.hcl
+# *.terraform-provider-aws_v6.26.0_x5.exe
+# *.LICENSE.txt
+#
+
+**/terra/.terraform
+*C:/Users/hp/Desktop/Pipeline/terra/.terraform/providers/registry.terraform.io/hashicorp/aws/6.26.0/windows_amd64/terraform-provider-aws_v6.26.0_x5.exe
+*.Githubpipelineuser_accessKeys.csv
+*terraform.tfstate

@@ -1,0 +1,26 @@
+trigger:
+- main
+
+pools:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+- checkout: self
+  displayName: 'Checkout repo'
+
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y opa
+  displayName: 'Install OPA'
+#
+- task: TerraformInstaller@1
+  displayName: 'Install Terraform'
+  inputs:
+    terraformVersion: 'latest'
+
+
+
+
+
+
