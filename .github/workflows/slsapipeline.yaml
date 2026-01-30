@@ -21,7 +21,6 @@ jobs:
   # setting up the job name it does not matter we keep we can keep it like pipeline job or anything else 
   plan: 
     runs-on: ubuntu-latest
-    environment: aws_key
     steps:
     #The action is to checkout the repo
       - name: checkoutrepo
@@ -84,12 +83,10 @@ jobs:
   apply:
     needs: plan
     runs-on: ubuntu-latest
-    environment: aws_key
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4
-      #
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -109,6 +106,5 @@ jobs:
       working-directory: terra
       run: terraform apply -auto-approve 
       #upating the code here
-#
 
 
