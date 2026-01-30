@@ -1,22 +1,29 @@
+# name of the pipeline we set 
 name: tfpipeline
-
-on:
+# ----------------------
+# after that we setup the condition on which it must be executed 
+on: 
+# on pullrequest condition 
   pull_request:
+# on push request condition 
   push:
+  # pushing is done directly to main branch 
     branches: ["main"]
-
-permissions:
-  contents: read
+# ----------------------
+#what should the policy do 
+permissions: 
+  contents: read 
   id-token: write
-
-jobs:
-  plan:
+# --------------------------
+# setting up the branch for the main 
+# job 
+jobs: 
+  # setting up the job name it does not matter we keep we can keep it like pipeline job or anything else 
+  plan: 
     runs-on: ubuntu-latest
 
-    outputs:
-      base64_subjects: ${{ steps.slsa_subjects.outputs.base64_subjects }}
-
     steps:
+    #The action is to checkout the repo
       - name: checkoutrepo
         uses: actions/checkout@v4
 
@@ -26,10 +33,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-
+      
       - name: Install OPA (linux_amd64)
         run: |
           curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
@@ -41,100 +47,66 @@ jobs:
         working-directory: terra
         run: terraform init -input=false
 
-      - name: Terraform Plan (binary plan file)
+      - name: Terraform Plan
         working-directory: terra
-        run: terraform plan -out=tfplan.binary -input=false
+        run: terraform plan -out=tfplan -input=false
 
-      - name: create json file for the opa policy
+      - name: Save tfplan binary file
         working-directory: terra
-        run: terraform show -json tfplan.binary > terraformplan.json
-
-      - name: Run OPA policy check
-        working-directory: terra
-        run: opa eval -i terraformplan.json -d tf.rego 'data.pipeline'
-
-      # ----existing Sigstore signing ----
+        run: terraform plan -out=tfplan.binary
+      #checking the terraform binary file 
       - name: signing_files
         uses: sigstore/gh-action-sigstore-python@v3.1.0
         with:
           inputs: terra/tfplan.binary
 
       - name: verify_signed_tfplan
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        uses: sigstore/gh-action-sigstore-python@v3.1.0  
         with:
           inputs: terra/tfplan.binary.sigstore.json
           verify: true
+          #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
+
           verify-cert-identity: https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
           verify-oidc-issuer: https://token.actions.githubusercontent.com
+      - name: create json file for the opa policy 
+        working-directory: terra
+        run : terraform show -json tfplan.binary > terraformplan.json
 
-      # SLSAbase64-subjects from plan hash ----
-      - name: Compute SLSA subjects (base64 sha256)
-        id: slsa_subjects
-        run: |
-          echo "base64_subjects=$(sha256sum terra/tfplan.binary | base64 -w0)" >> "$GITHUB_OUTPUT"
 
-      # share the plan with apply job
-      - name: Upload tfplan.binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan
-          path: terra/tfplan.binary
+      - name: Run OPA policy check
+        working-directory: terra
+        run: opa eval -i terraformplan.json -d tf.rego 'data.pipeline'
 
-  # SLSA provenance job
-  provenance:
-    needs: plan
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
-    with:
-      base64-subjects: "${{ needs.plan.outputs.base64_subjects }}"
-
+#This is the second job which will apply the changes only if the first job is successful 
+#This job will be seccessful only on the push event to the main branch
+#testing
   apply:
-    needs: [plan, provenance]
+    needs: plan
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4
 
-      # download the exact plan that was checked/signed
-      - name: Download tfplan.binary
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
 
-      # SLSA verification gate (blocks manual/unknown plans)
-      - name: Verify SLSA provenance (gate)
-        run: |
-          curl -L -o slsa-verifier.tar.gz https://github.com/slsa-framework/slsa-verifier/releases/latest/download/slsa-verifier-linux-amd64.tar.gz
-          tar -xzf slsa-verifier.tar.gz
-          sudo mv slsa-verifier /usr/local/bin/slsa-verifier
+    - name: Terraform Init
+      working-directory: terra
+      run: terraform init
 
-          slsa-verifier verify-artifact \
-            --artifact-path tfplan.binary \
-            --source "github.com/${{ github.repository }}" \
-            --branch "main"
+    - name: Terraform Apply
+      working-directory: terra
+      run: terraform apply -auto-approve 
+      #upating the code here
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        working-directory: terra
-        run: terraform init -input=false
-
-      # Apply the verified plan (NOT a fresh apply)
-      - name: Terraform Apply (apply verified plan)
-        working-directory: terra
-        run: terraform apply -auto-approve ../tfplan.binary
-
-        #
