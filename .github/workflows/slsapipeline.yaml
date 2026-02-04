@@ -63,12 +63,12 @@ jobs:
       - name: verify_signed_tfplan
         uses: sigstore/gh-action-sigstore-python@v3.1.0  
         with:
-          inputs: terra/tfplan.binary.sigstore.json
+          inputs: terra/tfplan.binary.sigstore.json    
           verify: true
           #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
 
           verify-cert-identity: https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
-          verify-oidc-issuer: https://token.actions.githubusercontent.com
+          # verify-oidc-issuer: https://token.actions.githubusercontent.com
       - name: create json file for the opa policy 
         working-directory: terra
         run : terraform show -json tfplan.binary > terraformplan.json
