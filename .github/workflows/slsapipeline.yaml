@@ -3,7 +3,7 @@ name: tfpipeline
 # ----------------------
 # after that we setup the condition on which it must be executed 
 on: 
-# on pullrequest condition 
+# on pullrequest condition ###
   pull_request:
 # on push request condition 
   push:
