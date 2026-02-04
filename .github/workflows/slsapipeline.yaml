@@ -67,7 +67,7 @@ jobs:
           verify: true
           #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
 
-          verify-cert-identity: https://github.com/MoulikMahajan2004/SLSA.github/slsapipeline.yaml@refs/heads/main
+          verify-cert-identity: https://github.com/MoulikMahajan2004/SLSA/.github/slsapipeline.yaml@refs/heads/main
           verify-oidc-issuer: https://token.actions.githubusercontent.com
       
         #creating the normal json plan  file for the tf so that plan can be implemented
