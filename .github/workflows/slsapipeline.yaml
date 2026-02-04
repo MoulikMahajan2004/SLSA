@@ -63,7 +63,7 @@ jobs:
       - name: verify_signed_tfplan
         uses: sigstore/gh-action-sigstore-python@v3.1.0  
         with:
-          inputs: terra/tfplan.binary.sigstore.json    
+          inputs: terra/tfplan.binary.sigstore.json.sigstore.json    
           verify: true
           #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
 
@@ -73,7 +73,7 @@ jobs:
         working-directory: terra
         run : terraform show -json tfplan.binary > terraformplan.json
 
-
+                                                                                                                                                                                                                  
       - name: Run OPA policy check
         working-directory: terra
         run: opa eval -i terraformplan.json -d tf.rego 'data.pipeline'
