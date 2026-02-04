@@ -63,7 +63,7 @@ jobs:
       - name: verify_signed_tfplan
         uses: sigstore/gh-action-sigstore-python@v3.1.0  
         with:
-          inputs: terra/tfplan.binary.sigstore.json.sigstore.json    
+          inputs: terra/
           verify: true
           #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
 
