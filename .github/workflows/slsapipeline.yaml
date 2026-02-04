@@ -68,7 +68,7 @@ jobs:
           #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
 
           verify-cert-identity: https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main
-          # verify-oidc-issuer: https://token.actions.githubusercontent.com
+          verify-oidc-issuer: https://token.actions.githubusercontent.com
       - name: create json file for the opa policy 
         working-directory: terra
         run : terraform show -json tfplan.binary > terraformplan.json
