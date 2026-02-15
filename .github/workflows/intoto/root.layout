@@ -1,0 +1,192 @@
+{
+  "signed": {
+    "_type": "layout",
+    "expires": "2027-12-31T23:59:59Z",
+    "readme": "in-toto layout for tfpipeline (Terraform + Sigstore + OPA): init -> plan -> sign -> verify -> opa -> apply",
+
+    "keys": {
+      "ci-keyid": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "./builder-key.pub"
+        }
+      }
+    },
+
+    "steps": [
+      {
+        "_type": "step",
+        "name": "checkout",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+        "expected_materials": [
+          ["ALLOW", "*"]
+        ],
+        "expected_products": [
+          ["ALLOW", "*"]
+        ],
+        "expected_command": ["bash", "-lc", "true"]
+      },
+
+      {
+        "_type": "step",
+        "name": "terraform-init",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["ALLOW", "terra/**"]
+        ],
+
+        "expected_products": [
+          ["ALLOW", "terra/.terraform/**"],
+          ["CREATE", "terra/.terraform.lock.hcl"]
+        ],
+
+        "expected_command": [
+          "terraform",
+          "init",
+          "-input=false"
+        ]
+      },
+
+      {
+        "_type": "step",
+        "name": "terraform-plan",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["MATCH", "terra/.terraform.lock.hcl", "WITH", "PRODUCTS", "FROM", "terraform-init"],
+          ["ALLOW", "terra/**"]
+        ],
+
+        "expected_products": [
+          ["CREATE", "terra/tfplan"],
+          ["CREATE", "terra/tfplan.binary"]
+        ],
+
+        "expected_command": [
+          "bash",
+          "-lc",
+          "terraform plan -out=tfplan -input=false && terraform plan -out=tfplan.binary"
+        ]
+      },
+
+      {
+        "_type": "step",
+        "name": "sigstore-sign",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["MATCH", "terra/tfplan.binary", "WITH", "PRODUCTS", "FROM", "terraform-plan"]
+        ],
+
+        "expected_products": [
+          ["CREATE", "terra/tfplan.binary.sigstore.json"]
+        ],
+
+        "expected_command": [
+          "bash",
+          "-lc",
+          "sigstore-sign-action"
+        ]
+      },
+
+      {
+        "_type": "step",
+        "name": "sigstore-verify",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["MATCH", "terra/tfplan.binary.sigstore.json", "WITH", "PRODUCTS", "FROM", "sigstore-sign"]
+        ],
+
+        "expected_products": [
+          ["ALLOW", "*"]
+        ],
+
+        "expected_command": [
+          "bash",
+          "-lc",
+          "sigstore-verify-action"
+        ]
+      },
+
+      {
+        "_type": "step",
+        "name": "create-terraformplan-json",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["MATCH", "terra/tfplan.binary", "WITH", "PRODUCTS", "FROM", "terraform-plan"]
+        ],
+
+        "expected_products": [
+          ["CREATE", "terra/terraformplan.json"]
+        ],
+
+        "expected_command": [
+          "bash",
+          "-lc",
+          "terraform show -json tfplan.binary > terraformplan.json"
+        ]
+      },
+
+      {
+        "_type": "step",
+        "name": "opa-policy",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["MATCH", "terra/terraformplan.json", "WITH", "PRODUCTS", "FROM", "create-terraformplan-json"],
+          ["ALLOW", "terra/tf.rego"],
+          ["MATCH", "terra/tfplan.binary", "WITH", "PRODUCTS", "FROM", "terraform-plan"]
+        ],
+
+        "expected_products": [
+          ["ALLOW", "*"]
+        ],
+
+        "expected_command": [
+          "opa",
+          "eval",
+          "-i",
+          "terraformplan.json",
+          "-d",
+          "tf.rego",
+          "data.pipeline"
+        ]
+      },
+
+      {
+        "_type": "step",
+        "name": "terraform-apply",
+        "threshold": 1,
+        "pubkeys": ["ci-keyid"],
+
+        "expected_materials": [
+          ["MATCH", "terra/tfplan.binary", "WITH", "PRODUCTS", "FROM", "terraform-plan"]
+        ],
+
+        "expected_products": [
+          ["ALLOW", "*"]
+        ],
+
+        "expected_command": [
+          "terraform",
+          "apply",
+          "-auto-approve"
+        ]
+      }
+    ],
+
+    "inspect": []
+  },
+
+  "signatures": []
+}

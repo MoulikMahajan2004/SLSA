@@ -1,0 +1,114 @@
+# name of the pipeline we set 
+name: tfpipeline
+# ----------------------
+# after that we setup the condition on which it must be executed 
+on: 
+# on pullrequest condition ###
+  pull_request:
+# on push request condition 
+  push:
+  # pushing is done directly to main branch 
+    branches: ["main"]
+# ----------------------
+#what should the policy do 
+permissions: 
+  contents: read 
+  id-token: write
+# --------------------------
+# setting up the branch for the main 
+# job 
+jobs: 
+  # setting up the job name it does not matter we keep we can keep it like pipeline job or anything else 
+  plan: 
+    runs-on: ubuntu-latest
+
+    steps:
+    #The action is to checkout the repo
+      - name: checkoutrepo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      
+      - name: Install OPA (linux_amd64)
+        run: |
+          curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+          opa version
+
+      - name: Terraform Init
+        working-directory: terra
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        working-directory: terra
+        run: terraform plan -out=tfplan -input=false
+
+      - name: Save tfplan binary file
+        working-directory: terra
+        run: terraform plan -out=tfplan.binary
+       #checking the terraform binary file 
+      - name: signing_files
+        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        with:
+          inputs: terra/tfplan.binary
+
+      - name: verify_signed_tfplan
+        uses: sigstore/gh-action-sigstore-python@v3.1.0  
+        with:
+          inputs: terra/tfplan.binary.sigstore.json
+          verify: true
+          #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main #
+   ###
+          verify-cert-identity: https://github.com/MoulikMahajan2004/SLSA/.github/workflows/slsapipeline.yaml@refs/heads/main
+
+          verify-oidc-issuer: https://token.actions.githubusercontent.com
+      
+        #creating the normal json plan  file for the tf so that plan can be implemented
+      - name: create json file for the opa policy 
+        working-directory: terra
+        run : terraform show -json tfplan.binary > terraformplan.json                                                                                                                                                                            
+      - name: Run OPA policy check
+        working-directory: terra
+        run: opa eval -i terraformplan.json -d tf.rego 'data.pipeline'
+
+
+#This is the second job which will apply the changes only if the first job is successful 
+#This job will be seccessful only on the push event to the main branch
+#testing
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform Init
+      working-directory: terra
+      run: terraform init
+
+    - name: Terraform Apply
+      working-directory: terra
+      run: terraform apply -auto-approve 
+      #upating the code here
+
+
+
