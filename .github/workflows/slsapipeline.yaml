@@ -41,15 +41,15 @@ jobs:
       # --- Load in-toto CI functionary key from secrets ---
       - name: Load in-toto CI signing key
         run: |
-          mkdir -p in-toto/keys in-toto/links
-          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > in-toto/keys/ci.key
-          chmod 600 in-toto/keys/ci.key
+          mkdir -p intoto/keys intoto/links
+          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > intoto/keys/ci.key
+          chmod 600 intoto/keys/ci.key
 
-          # Optional: public key (for consistency/debug)
-          if [ -n "${{ secrets.IN_TOTO_CI_PUB_B64 }}" ]; then
-            echo "${{ secrets.IN_TOTO_CI_PUB_B64 }}" | base64 -d > in-toto/keys/ci.pub
-            chmod 644 in-toto/keys/ci.pub
-          fi
+ #         # # Optional: public key (for consistency/debug)
+          # if [ -n "${{ secrets.IN_TOTO_CI_PUB_B64 }}" ]; then
+          #   echo "${{ secrets.IN_TOTO_CI_PUB_B64 }}" | base64 -d > in-toto/keys/ci.pub
+          #   chmod 644 in-toto/keys/ci.pub
+          # fi
 
       # ---------- in-toto steps (produce .link evidence) ----------
       - name: Terraform Init (in-toto)
