@@ -52,12 +52,13 @@ jobs:
         working-directory: terra
         run: |
           in-toto-run \
-            --step-name terraform-init \
-            --key ci.key \
-            --materials . \
-            --products .terraform .terraform.lock.hcl \
-             --metadata-directory ../intoto/links \
-            -- terraform init -input=false
+          --step-name terraform-init \
+          --signing-key ci.key \
+          --materials . \
+          --products .terraform .terraform.lock.hcl \
+          --metadata-directory ../intoto/links \
+          -- terraform init -input=false
+
 
       - name: Terraform Plan in-toto
         working-directory: terra
