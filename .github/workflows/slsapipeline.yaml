@@ -40,10 +40,11 @@ jobs:
 
       # --- Load in-toto CI functionary key from secrets ---
       - name: Load in-toto CI signing key for the files of .link
-        working-directory: ./.github/workflows/intoto/keys
+        working-directory: ./github/workflows/intoto/keys
         run: |
           pwd
           echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > ci.key
+          cd ./github/workflows/intoto/keys | ls
           chmod 600 ci.key
  ###3
 #4444
@@ -51,10 +52,10 @@ jobs:
       - name: Terraform Init (in-toto)
         working-directory: terra
         run: |
-          cd ./github/workflows/intoto/keys | ls
+          
           in-toto-run \
           --step-name terraform-init \
-          --signing-key ./.github/workflows/intoto/keys/ci.key \
+          --signing-key ./github/workflows/intoto/keys/ci.key \
           --materials . \
           --products .terraform .terraform.lock.hcl \
           --metadata-directory ./.github/workflows/intoto/links \
