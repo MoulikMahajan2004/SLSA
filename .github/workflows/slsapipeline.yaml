@@ -63,7 +63,7 @@ jobs:
             --products .terraform .terraform.lock.hcl \
             -- terraform init -input=false
 
-      - name: Terraform Plan (in-toto)
+      - name: Terraform Plan(in-toto)
         working-directory: terra
         run: |
           in-toto-run \
@@ -92,7 +92,7 @@ jobs:
             --oidc-issuer "https://token.actions.githubusercontent.com" \
             | tee terra/sigstore_verify.txt
 
-      - name: Record sigstore-verify (in-toto)
+      - name: Record sigstore-verify( in-toto)
         run: |
           in-toto-run \
             --step-name sigstore-verify \
