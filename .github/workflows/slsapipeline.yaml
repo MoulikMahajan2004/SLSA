@@ -54,15 +54,13 @@ jobs:
         working-directory: terra
         run: |
           
-          in-toto-run \
-          --step-name terraform-init \
-          cd ./.github/workflows/intoto/keys
-          --signing-key ci.key \
-          --materials . \
-          --products .terraform .terraform.lock.hcl \
-           cd ./.github/workflows/intoto/links
-          --metadata-directory ./.github/workflows/intoto/links \
-          -- terraform init -input=false
+            in-toto-run \
+             --step-name terraform-init \
+             --signing-key ../.github/workflows/intoto/keys/ci.key \
+             --metadata-directory ../.github/workflows/intoto/links \
+             --materials . \
+             --products .terraform .terraform.lock.hcl \
+             -- terraform init -input=false
 
 
       - name: Terraform Plan in-toto
