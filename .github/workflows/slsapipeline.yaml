@@ -53,7 +53,9 @@ jobs:
         run: |
           in-toto-run \
             --step-name terraform-init \
-            --key ./.github/workflows/intoto/keys/ci.key \
+            -- cd ./github/workflows/intoto/keys
+            --key ci.key \
+            --cd ./SLSA/terra
             --metadata-directory ../intoto/links \
             --materials . \
             --products .terraform .terraform.lock.hcl \
