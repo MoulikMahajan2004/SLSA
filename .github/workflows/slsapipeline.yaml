@@ -1,30 +1,19 @@
-# name of the pipeline we set 
-name: tfpipeline
-# ----------------------
-# after that we setup the condition on which it must be executed 
-on: 
-# on pullrequest condition ###
-  pull_request:
-# on push request condition 
-  push:
-  # pushing is done directly to main branch 
-    branches: ["main"]
-# ----------------------
-#what should the policy do 
-permissions: 
-  contents: read 
-  id-token: write
-# --------------------------
-# setting up the branch for the main 
-# job 
-jobs: 
-  # setting up the job name it does not matter we keep we can keep it like pipeline job or anything else 
-  plan: 
-    runs-on: ubuntu-latest
+name: tfpipeline-intoto
 
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
     steps:
-    #The action is to checkout the repo
-      - name: checkoutrepo
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials
@@ -33,82 +22,173 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-      
-      - name: Install OPA (linux_amd64)
+
+      - name: Install OPA
         run: |
           curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
           chmod +x opa
           sudo mv opa /usr/local/bin/opa
           opa version
 
-      - name: Terraform Init
-        working-directory: terra
-        run: terraform init -input=false
+      - name: Install in-toto + sigstore (CLI)
+        run: |
+          python -m pip install --upgrade pip
+          pip install in-toto sigstore
 
-      - name: Terraform Plan
-        working-directory: terra
-        run: terraform plan -out=tfplan -input=false
+      # --- Load in-toto CI functionary key from secrets ---
+      - name: Load in-toto CI signing key
+        run: |
+          mkdir -p in-toto/keys in-toto/links
+          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > in-toto/keys/ci.key
+          chmod 600 in-toto/keys/ci.key
 
-      - name: Save tfplan binary file
+          # Optional: public key (for consistency/debug)
+          if [ -n "${{ secrets.IN_TOTO_CI_PUB_B64 }}" ]; then
+            echo "${{ secrets.IN_TOTO_CI_PUB_B64 }}" | base64 -d > in-toto/keys/ci.pub
+            chmod 644 in-toto/keys/ci.pub
+          fi
+
+      # ---------- in-toto steps (produce .link evidence) ----------
+      - name: Terraform Init (in-toto)
         working-directory: terra
-        run: terraform plan -out=tfplan.binary
-       #checking the terraform binary file 
-      - name: signing_files
-        uses: sigstore/gh-action-sigstore-python@v3.1.0
+        run: |
+          in-toto-run \
+            --step-name terraform-init \
+            --key ../in-toto/keys/ci.key \
+            --metadata-directory ../in-toto/links \
+            --materials . \
+            --products .terraform .terraform.lock.hcl \
+            -- terraform init -input=false
+
+      - name: Terraform Plan (in-toto)
+        working-directory: terra
+        run: |
+          in-toto-run \
+            --step-name terraform-plan \
+            --key ../in-toto/keys/ci.key \
+            --metadata-directory ../in-toto/links \
+            --materials . \
+            --products tfplan.binary \
+            -- terraform plan -out=tfplan.binary -input=false
+
+      - name: Sigstore Sign (in-toto)
+        run: |
+          in-toto-run \
+            --step-name sigstore-sign \
+            --key in-toto/keys/ci.key \
+            --metadata-directory in-toto/links \
+            --materials terra/tfplan.binary \
+            --products terra/tfplan.binary.sigstore.json \
+            -- sigstore sign terra/tfplan.binary > /dev/null
+
+      - name: Sigstore Verify Identity
+        run: |
+          sigstore verify identity terra/tfplan.binary \
+            --bundle terra/tfplan.binary.sigstore.json \
+            --cert-identity "https://github.com/MoulikMahajan2004/SLSA/.github/workflows/slsapipeline.yaml@refs/heads/main" \
+            --oidc-issuer "https://token.actions.githubusercontent.com" \
+            | tee terra/sigstore_verify.txt
+
+      - name: Record sigstore-verify (in-toto)
+        run: |
+          in-toto-run \
+            --step-name sigstore-verify \
+            --key in-toto/keys/ci.key \
+            --metadata-directory in-toto/links \
+            --materials terra/tfplan.binary terra/tfplan.binary.sigstore.json \
+            --products terra/sigstore_verify.txt \
+            -- bash -lc "true"
+
+      - name: Create JSON plan (in-toto)
+        working-directory: terra
+        run: |
+          in-toto-run \
+            --step-name create-terraformplan-json \
+            --key ../in-toto/keys/ci.key \
+            --metadata-directory ../in-toto/links \
+            --materials tfplan.binary \
+            --products terraformplan.json \
+            -- bash -lc "terraform show -json tfplan.binary > terraformplan.json"
+
+      - name: OPA policy check (in-toto)
+        working-directory: terra
+        run: |
+          opa eval -i terraformplan.json -d tf.rego 'data.pipeline' | tee opa_result.txt
+
+          in-toto-run \
+            --step-name opa-policy \
+            --key ../in-toto/keys/ci.key \
+            --metadata-directory ../in-toto/links \
+            --materials terraformplan.json tf.rego tfplan.binary \
+            --products opa_result.txt \
+            -- bash -lc "true"
+
+      # ---------- Verify against your layout ----------
+      - name: in-toto verify (gate)
+        run: |
+          ls -la in-toto/links || true
+          in-toto-verify \
+            --layout in-toto/root.layout \
+            --link-dir in-toto/links \
+            -v
+
+      # Upload plan + evidence so apply job can reuse exact artifacts
+      - name: Upload plan + evidence
+        uses: actions/upload-artifact@v4
         with:
-          inputs: terra/tfplan.binary
+          name: tfplan-and-intoto
+          path: |
+            terra/tfplan.binary
+            terra/tfplan.binary.sigstore.json
+            terra/sigstore_verify.txt
+            terra/terraformplan.json
+            terra/opa_result.txt
+            in-toto/root.layout
+            in-toto/links/**
 
-      - name: verify_signed_tfplan
-        uses: sigstore/gh-action-sigstore-python@v3.1.0  
-        with:
-          inputs: terra/tfplan.binary.sigstore.json
-          verify: true
-          #https://github.com/MoulikMahajan2004/PIPELine/.github/workflows/terraformpipeline.yaml@refs/heads/main #
-   ###
-          verify-cert-identity: https://github.com/MoulikMahajan2004/SLSA/.github/workflows/slsapipeline.yaml@refs/heads/main
-
-          verify-oidc-issuer: https://token.actions.githubusercontent.com
-      
-        #creating the normal json plan  file for the tf so that plan can be implemented
-      - name: create json file for the opa policy 
-        working-directory: terra
-        run : terraform show -json tfplan.binary > terraformplan.json                                                                                                                                                                            
-      - name: Run OPA policy check
-        working-directory: terra
-        run: opa eval -i terraformplan.json -d tf.rego 'data.pipeline'
-
-
-#This is the second job which will apply the changes only if the first job is successful 
-#This job will be seccessful only on the push event to the main branch
-#testing
   apply:
     needs: plan
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-    
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
+      - name: Download plan + evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-and-intoto
 
-    - name: Terraform Init
-      working-directory: terra
-      run: terraform init
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Terraform Apply
-      working-directory: terra
-      run: terraform apply -auto-approve 
-      #upating the code here
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
+      - name: Install in-toto
+        run: |
+          python -m pip install --upgrade pip
+          pip install in-toto
 
+      # Re-verify in apply job before changing infra
+      - name: Re-verify in-toto (block apply if fail)
+        run: |
+          in-toto-verify \
+            --layout in-toto/root.layout \
+            --link-dir in-toto/links \
+            -v
 
+      - name: Terraform Init
+        working-directory: terra
+        run: terraform init -input=false
+
+      - name: Terraform Apply exact plan
+        working-directory: terra
+        run: terraform apply -auto-approve tfplan.binary
