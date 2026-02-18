@@ -53,7 +53,7 @@ jobs:
         run: |
           in-toto-run \
             --step-name terraform-init \
-            --key ../intoto/keys/ci.key \
+            --key ${{ secrets.IN_TOTO_CI_KEY_B64 }}\
             --metadata-directory ../intoto/links \
             --materials . \
             --products .terraform .terraform.lock.hcl \
