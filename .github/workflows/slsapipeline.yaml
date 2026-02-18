@@ -45,12 +45,7 @@ jobs:
           mkdir -p intoto/keys intoto/links
           echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}"> intoto/keys/ci.key
           chmod 600 intoto/keys/ci.key
-# updating the keys from base 64 to normal
- #         # # Optional: public key (for consistency/debug)
-          # if [ -n "${{ secrets.IN_TOTO_CI_PUB_B64 }}" ]; then
-          #   echo "${{ secrets.IN_TOTO_CI_PUB_B64 }}" | base64 -d > in-toto/keys/ci.pub
-          #   chmod 644 in-toto/keys/ci.pub
-          # fi
+
 
       # ---------- in-toto steps (produce .link evidence) ----------
       - name: Terraform Init (in-toto)
@@ -58,8 +53,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name terraform-init \
-            --key ../in-toto/keys/ci.key \
-            --metadata-directory ../in-toto/links \
+            --key ../intoto/keys/ci.key \
+            --metadata-directory ../intoto/links \
             --materials . \
             --products .terraform .terraform.lock.hcl \
             -- terraform init -input=false
@@ -69,8 +64,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name terraform-plan \
-            --key ../in-toto/keys/ci.key \
-            --metadata-directory ../in-toto/links \
+            --key ../intoto/keys/ci.key \
+            --metadata-directory ../intoto/links \
             --materials . \
             --products tfplan.binary \
             -- terraform plan -out=tfplan.binary -input=false
@@ -79,8 +74,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name sigstore-sign \
-            --key in-toto/keys/ci.key \
-            --metadata-directory in-toto/links \
+            --key intoto/keys/ci.key \
+            --metadata-directory intoto/links \
             --materials terra/tfplan.binary \
             --products terra/tfplan.binary.sigstore.json \
             -- sigstore sign terra/tfplan.binary > /dev/null
@@ -97,8 +92,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name sigstore-verify \
-            --key in-toto/keys/ci.key \
-            --metadata-directory in-toto/links \
+            --key intoto/keys/ci.key \
+            --metadata-directory intoto/links \
             --materials terra/tfplan.binary terra/tfplan.binary.sigstore.json \
             --products terra/sigstore_verify.txt \
             -- bash -lc "true"
@@ -108,8 +103,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name create-terraformplan-json \
-            --key ../in-toto/keys/ci.key \
-            --metadata-directory ../in-toto/links \
+            --key ../intoto/keys/ci.key \
+            --metadata-directory ../intoto/links \
             --materials tfplan.binary \
             --products terraformplan.json \
             -- bash -lc "terraform show -json tfplan.binary > terraformplan.json"
@@ -121,8 +116,8 @@ jobs:
 
           in-toto-run \
             --step-name opa-policy \
-            --key ../in-toto/keys/ci.key \
-            --metadata-directory ../in-toto/links \
+            --key ../intoto/keys/ci.key \
+            --metadata-directory ../intoto/links \
             --materials terraformplan.json tf.rego tfplan.binary \
             --products opa_result.txt \
             -- bash -lc "true"
@@ -130,10 +125,10 @@ jobs:
       # ---------- Verify against your layout ----------
       - name: in-toto verify (gate)
         run: |
-          ls -la in-toto/links || true
+          ls -la intoto/links || true
           in-toto-verify \
-            --layout in-toto/root.layout \
-            --link-dir in-toto/links \
+            --layout intoto/root.layout \
+            --link-dir intoto/links \
             -v
 
       # Upload plan + evidence so apply job can reuse exact artifacts
@@ -182,8 +177,8 @@ jobs:
       - name: Re-verify in-toto (block apply if fail)
         run: |
           in-toto-verify \
-            --layout in-toto/root.layout \
-            --link-dir in-toto/links \
+            --layout intoto/root.layout \
+            --link-dir intoto/links \
             -v
 
       - name: Terraform Init
