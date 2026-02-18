@@ -43,7 +43,7 @@ jobs:
         run: |
 
           mkdir -p intoto/keys intoto/links
-          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}"> intoto/keys/ci.key
+          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > intoto/keys/ci.key
           chmod 600 intoto/keys/ci.key
 
 
