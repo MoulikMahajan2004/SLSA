@@ -46,19 +46,17 @@ jobs:
           echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > ci.key
           chmod 600 ci.key
 
-
+#4444
       # ---------- in-toto steps (produce .link evidence) ----------
       - name: Terraform Init (in-toto)
         working-directory: terra
         run: |
           in-toto-run \
             --step-name terraform-init \
-            -- cd ./github/workflows/intoto/keys
             --key ci.key \
-            --cd ./SLSA/terra
-            --metadata-directory ../intoto/links \
             --materials . \
             --products .terraform .terraform.lock.hcl \
+             --metadata-directory ../intoto/links \
             -- terraform init -input=false
 
       - name: Terraform Plan in-toto
