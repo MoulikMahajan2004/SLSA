@@ -38,7 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install in-toto sigstore
 
-      # --- Load in-toto CI functionary key from secrets ---
+      # --- ##Load in-toto CI functionary key from secrets ---
       - name: Load in-toto CI signing key for the files of .link
         working-directory: ./.github/workflows/intoto/keys
         run: |
