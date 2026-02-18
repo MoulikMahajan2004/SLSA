@@ -51,7 +51,7 @@ jobs:
       - name: Terraform Init (in-toto)
         working-directory: terra
         run: |
-          cd ./github/workflows/intoto/keys ls
+          cd ./github/workflows/intoto/keys | ls
           in-toto-run \
           --step-name terraform-init \
           --signing-key ./.github/workflows/intoto/keys/ci.key \
