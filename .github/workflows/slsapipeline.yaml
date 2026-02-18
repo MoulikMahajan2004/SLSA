@@ -43,8 +43,8 @@ jobs:
         working-directory: ./.github/workflows/intoto/keys
         run: |
           pwd
-          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > intoto/keys/ci.key
-          chmod 600 intoto/keys/ci.key
+          echo "${{ secrets.IN_TOTO_CI_KEY_B64 }}" | base64 -d > ci./home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
+          chmod 600 /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
 
 
       # ---------- in-toto steps (produce .link evidence) ----------
