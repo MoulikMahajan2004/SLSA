@@ -40,7 +40,7 @@ jobs:
 
       # --- Load in-toto CI functionary key from secrets ---
       - name: Load in-toto CI signing key for the files of .link
-        working-directory: /usr/bin
+        working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto
         run: |
           ls
           
