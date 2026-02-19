@@ -42,6 +42,7 @@ jobs:
       - name: Load in-toto CI signing key for the files of .link
         working-directory: ./.github/workflows/intoto/keys
         run: |
+          touch ci.key
           printf '%s' "${{secrets.IN_TOTO_CI_KEY_B64}}" > ci.key
           chmod 600 ci.key
           echo "key creaeted is below"
