@@ -43,10 +43,6 @@ jobs:
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
          pwd
-         cd /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
-         pwd
-         echo "current directory is $(pwd)"
-         echo "hi" > test.txt
          ls
 
           
