@@ -43,8 +43,10 @@ jobs:
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
          pwd
+         cd .github
+         pwd
          ls
-
+        
           
           
  ###3##
