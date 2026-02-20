@@ -92,11 +92,11 @@ jobs:
         run: |
           in-toto-run \
             --step-name sigstore-sign \
-            --signing-key "../.github/workflows/intoto/keys/ci.key" \
-            --metadata-directory "../.github/workflows/intoto/links" \
+            --signing-key ".github/workflows/intoto/keys/ci.key" \
+            --metadata-directory ".github/workflows/intoto/links" \
             --materials terra/tfplan.binary \
             --products terra/tfplan.binary.sigstore.json \
-            -- sigstore sign terra/tfplan.binary > /dev/null
+            -- sigstore sign terra/tfplan.binary 
 
       - name: Sigstore Verify Identity
         run: |
