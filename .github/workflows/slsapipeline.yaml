@@ -40,8 +40,10 @@ jobs:
 
       # --- Load in-toto CI functionary key from secrets ---
       - name: Load in-toto CI signing key for the files of .link
-        working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
+        # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
+         pwd
+         cd /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
          pwd
          echo "current directory is $(pwd)"
          echo "hi" > test.txt
