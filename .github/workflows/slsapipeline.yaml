@@ -71,7 +71,7 @@ jobs:
             in-toto-run \
              --step-name terraform-init \
              --signing-key "../.github/workflows/intoto/keys/ci.key" \
-              --metadata-directory "../.github/workflows/intoto/links" \
+             --metadata-directory "../.github/workflows/intoto/links" \
              --materials . \
              --products .terraform .terraform.lock.hcl \
              -- bash -lc 'timeout 600 terraform init -input=false -no-color'
@@ -82,8 +82,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name terraform-plan \
-            --key ../intoto/keys/ci.key \
-            --metadata-directory ../intoto/links \
+            --signing-key "../.github/workflows/intoto/keys/ci.key" \
+            --metadata-directory "../.github/workflows/intoto/links" \
             --materials . \
             --products tfplan.binary \
             -- terraform plan -out=tfplan.binary -input=false
@@ -92,8 +92,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name sigstore-sign \
-            --key intoto/keys/ci.key \
-            --metadata-directory intoto/links \
+            --signing-key "../.github/workflows/intoto/keys/ci.key" \
+            --metadata-directory "../.github/workflows/intoto/links" \
             --materials terra/tfplan.binary \
             --products terra/tfplan.binary.sigstore.json \
             -- sigstore sign terra/tfplan.binary > /dev/null
@@ -110,8 +110,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name sigstore-verify \
-            --key intoto/keys/ci.key \
-            --metadata-directory intoto/links \
+            --signing-key "../.github/workflows/intoto/keys/ci.key" \
+            --metadata-directory "../.github/workflows/intoto/links" \
             --materials terra/tfplan.binary terra/tfplan.binary.sigstore.json \
             --products terra/sigstore_verify.txt \
             -- bash -lc "true"
@@ -121,8 +121,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name create-terraformplan-json \
-            --key ../intoto/keys/ci.key \
-            --metadata-directory ../intoto/links \
+            --signing-key "../.github/workflows/intoto/keys/ci.key" \
+            --metadata-directory "../.github/workflows/intoto/links" \
             --materials tfplan.binary \
             --products terraformplan.json \
             -- bash -lc "terraform show -json tfplan.binary > terraformplan.json"
