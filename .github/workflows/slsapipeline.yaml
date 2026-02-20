@@ -42,7 +42,7 @@ jobs:
       - name: Load in-toto CI signing key for the files of .link
         working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
-         echo "hi" test.txt
+         echo "hi" > test.txt
          ls
 
           
