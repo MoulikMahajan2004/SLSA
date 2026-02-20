@@ -44,11 +44,11 @@ jobs:
         run: |
          pwd
          cd .github/workflows/intoto/keys
-         ls
          echo "${{ secrets.INTOTO_CI_KEY }}" > ci.key
+         cat ci.key
          chmod 600 ci.key
          ls
-
+#
 
         
           
