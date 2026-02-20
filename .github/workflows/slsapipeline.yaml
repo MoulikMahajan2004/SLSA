@@ -43,9 +43,13 @@ jobs:
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
          pwd
-         cd .github
-         pwd
+         cd .github/workflows/intoto/keys
          ls
+         echo "${{ secrets.INTOTO_CI_KEY }}" > ci.key
+         chmod 600 ci.key
+         ls
+
+
         
           
           
