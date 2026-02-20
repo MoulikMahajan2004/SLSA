@@ -40,11 +40,13 @@ jobs:
 
       # --- Load in-toto CI functionary key from secrets ---
       - name: Load in-toto CI signing key for the files of .link
+        env:
+          INTOTO_CI_KEY: ${{ secrets.INTOTO_CI_KEY }}
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
          pwd
          cd .github/workflows/intoto/keys
-         echo "${{ secrets.INTOTO_CI_KEY }}" > ci.key
+         echo "${{env.INTOTO_CI_KEY}}" > ci.key
          cat ci.key
          chmod 600 ci.key
          ls
