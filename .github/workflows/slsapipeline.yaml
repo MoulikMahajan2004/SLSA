@@ -73,7 +73,6 @@ jobs:
              --signing-key "../.github/workflows/intoto/keys/ci.key" \
              --materials . \
              --products .terraform .terraform.lock.hcl \
-             --timeout 600 \
              -- bash -lc 'timeout 600 terraform init -input=false -no-color'
 
 ##
