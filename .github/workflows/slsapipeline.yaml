@@ -110,8 +110,8 @@ jobs:
         run: |
           in-toto-run \
             --step-name sigstore-verify \
-            --signing-key "../.github/workflows/intoto/keys/ci.key" \
-            --metadata-directory "../.github/workflows/intoto/links" \
+            --signing-key ".github/workflows/intoto/keys/ci.key" \
+            --metadata-directory ".github/workflows/intoto/links" \
             --materials terra/tfplan.binary terra/tfplan.binary.sigstore.json \
             --products terra/sigstore_verify.txt \
             -- bash -lc "true"
@@ -134,8 +134,8 @@ jobs:
 
           in-toto-run \
             --step-name opa-policy \
-            --key ../intoto/keys/ci.key \
-            --metadata-directory ../intoto/links \
+            --signing-key "../.github/workflows/intoto/keys/ci.key" \
+            --metadata-directory "../.github/workflows/intoto/links" \
             --materials terraformplan.json tf.rego tfplan.binary \
             --products opa_result.txt \
             -- bash -lc "true"
