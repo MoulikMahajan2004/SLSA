@@ -62,7 +62,6 @@ jobs:
             in-toto-run \
              --step-name terraform-init \
              --signing-key ../ .github/workflows/intoto/keys/ci.key \
-             --metadata-directory ../ links \
              --materials . \
              --products .terraform .terraform.lock.hcl \
              -- terraform init -input=false
