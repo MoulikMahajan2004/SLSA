@@ -71,7 +71,7 @@ jobs:
             in-toto-run \
              --step-name terraform-init \
              --signing-key "../.github/workflows/intoto/keys/ci.key" \
-             --metadata-directory "../.github/workflows/intoto/links" \
+             --metadata-directory "../ .github/workflows/intoto/links" \
              --materials . \
              --products .terraform .terraform.lock.hcl \
              -- bash -lc 'timeout 600 terraform init -input=false -no-color'
