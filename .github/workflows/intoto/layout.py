@@ -68,28 +68,7 @@ s_opa.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terr
 s_opa.add_material_rule_from_string("DISALLOW *")
 s_opa.add_product_rule_from_string("CREATE opa_result.txt")
 s_opa.add_product_rule_from_string("DISALLOW *")
-# The following step does not expect a command, since modifying the source
-# code might not be reflected by a single command. However, final product
-# verification will still require a link metadata file with the name
-# "update-version.<bob's keyid prefix>.link". In-toto also provides tooling
-# to create a link metadata file for a step that is not carried out in a
-# single command (see 'in-toto-record').
 
-
-
-# Below step must be carried by Carl and expects a link file with the name
-# "package.<carl's keyid prefix>.link"
-
-
-
-
-# Create inspection
-
-# Inspections are commands that are executed upon in-toto final product
-# verification. In this case, we define an inspection that untars the final
-# product, which must match the product of the last step in the supply chain,
-# ('package') and verifies that the contents of the archive match with what was
-# put into the archive.
 inspection = Inspection(name="verify-json")
 inspection.set_run_from_string("terraform show -json tfplan.binary")
 inspection.add_material_rule_from_string(
@@ -103,17 +82,6 @@ sigstoreinspection.set_run_from_string("cat sigstore_verify.txt")
 layout.steps = [s_init, s_plan, s_sig_sign, s_sig_verify, s_json, s_opa]
 layout.inspect = [inspection, sigstoreinspection]
 
-
-# Eventually the layout gets wrapped in a generic in-toto metablock, which
-# provides functions to sign the metadata contents and write them to a file.
-# As mentioned above the layout contains the functionaries' public keys and
-# is signed by the project owner's private key.
-
-# In order to reduce the impact of a project owner key compromise, the layout
-# can and should be be signed by multiple project owners.
-
-# Project owner public keys must be provided together with the layout and the
-# link metadata files for final product verification.
 
 metablock = Metablock(signed=layout)
 metablock.create_signature(cryo_signer)
