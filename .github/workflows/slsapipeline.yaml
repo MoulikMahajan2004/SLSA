@@ -152,8 +152,6 @@ jobs:
       - name: in-toto verify (gate)
         
         run: |
-          cd .github/workflows/intoto
-          ls
           in-toto-verify \
            --layout .github/workflows/intoto/root.layout \
            --verification-keys .github/workflows/intoto/keys/ci.pub \
