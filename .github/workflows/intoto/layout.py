@@ -3,9 +3,12 @@
 from in_toto.models.layout import Layout, Step, Inspection
 from in_toto.models.metadata import Metablock
 from in_toto.models._signer import load_public_key_from_file
-
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from securesystemslib.signer import CryptoSigner
 #loading the public key of the functionaries from the file
 pubkey_dict = load_public_key_from_file("./keys/ci.pub")
+
+cryo_signer = CryptoSigner(load_pem_private_key(open("./keys/ci.key", "rb").read(), password=None))
 
 # Create layout
 layout = Layout()
@@ -113,4 +116,5 @@ layout.inspect = [inspection, sigstoreinspection]
 # link metadata files for final product verification.
 
 metablock = Metablock(signed=layout)
+metablock.create_signature(cryo_signer)
 metablock.dump("root.layout")
