@@ -154,7 +154,6 @@ jobs:
         run: |
           in-toto-verify \
            --layout .github/workflows/intoto/root.layout \
-           --verification-keys ${{secrets.IN_TOTO_CI_PUB_B64}} \
            --link-dir .github/workflows/intoto/links \
            -v
       
