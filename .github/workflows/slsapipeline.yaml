@@ -153,11 +153,18 @@ jobs:
         
         run: |
           cd .github/workflows/intoto
+          ls
           in-toto-verify \
-            --layout root.layout \
-            --link-dir ./links \
-            -v
-
+           --layout .github/workflows/intoto/root.layout \
+           --verification-keys .github/workflows/intoto/keys/ci.pub \
+           --link-dir .github/workflows/intoto/links \
+           -v
+      
+       # in-toto-verify \
+       #   --layout root.layout \
+       #   --layout-keys "./keys/ci.pub" \
+       #   --link-dir ./links \
+       #   -
       # Upload plan + evidence so apply job can reuse exact artifacts
       - name: Upload plan + evidence
         uses: actions/upload-artifact@v4
