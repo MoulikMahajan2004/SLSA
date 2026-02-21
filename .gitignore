@@ -16,4 +16,4 @@
 *.Githubpipelineuser_accessKeys.csv
 *terraform.tfstate
 *.key
-*ci.pub
+# *ci.pub
