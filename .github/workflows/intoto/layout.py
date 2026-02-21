@@ -20,16 +20,17 @@ layout.set_relative_expiration(months=4)
 
 # --- terraform-init ---
 s_init = Step(name="terraform-init")
-s_init.pubkeys = [pubkey_dict["keyid"]]
+s_init.pubkeys = [pubkey_dict["keyid"].keyid]
 s_init.add_material_rule_from_string("ALLOW *")
 s_init.add_product_rule_from_string("CREATE .terraform/*")
 s_init.add_product_rule_from_string("CREATE .terraform.lock.hcl")
 s_init.add_product_rule_from_string("DISALLOW *")
 s_init.expected_command = ["bash", "-lc", "timeout 600 terraform init -input=false -no-color"]
 s_init.threshold = 1
+
 # --- terraform-plan ---
 s_plan = Step(name="terraform-plan")
-s_plan.pubkeys = [pubkey_dict["keyid"]]
+s_plan.pubkeys = [pubkey_dict["keyid"].keyid]
 s_plan.add_material_rule_from_string("MATCH * WITH PRODUCTS FROM terraform-init")
 s_plan.add_material_rule_from_string("DISALLOW *")
 s_plan.add_product_rule_from_string("CREATE tfplan.binary")
@@ -37,7 +38,7 @@ s_plan.add_product_rule_from_string("DISALLOW *")
 
 # --- sigstore-sign ---
 s_sig_sign = Step(name="sigstore-sign")
-s_sig_sign.pubkeys = [pubkey_dict["keyid"]]
+s_sig_sign.pubkeys = [pubkey_dict["keyid"].keyid]
 s_sig_sign.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
 s_sig_sign.add_material_rule_from_string("DISALLOW *")
 s_sig_sign.add_product_rule_from_string("CREATE tfplan.binary.sigstore.json")
@@ -45,7 +46,7 @@ s_sig_sign.add_product_rule_from_string("DISALLOW *")
 
 # --- sigstore-verify ---
 s_sig_verify = Step(name="sigstore-verify")
-s_sig_verify.pubkeys = [pubkey_dict["keyid"]]
+s_sig_verify.pubkeys = [pubkey_dict["keyid"].keyid]
 s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
 s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary.sigstore.json WITH PRODUCTS FROM sigstore-sign")
 s_sig_verify.add_material_rule_from_string("DISALLOW *")
@@ -54,7 +55,7 @@ s_sig_verify.add_product_rule_from_string("DISALLOW *")
 
 # --- create-terraformplan-json ---
 s_json = Step(name="create-terraformplan-json")
-s_json.pubkeys = [pubkey_dict["keyid"]]
+s_json.pubkeys = [pubkey_dict["keyid"].keyid]
 s_json.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
 s_json.add_material_rule_from_string("DISALLOW *")
 s_json.add_product_rule_from_string("CREATE terraformplan.json")
@@ -62,7 +63,7 @@ s_json.add_product_rule_from_string("DISALLOW *")
 
 # --- opa-policy ---
 s_opa = Step(name="opa-policy")
-s_opa.pubkeys = [pubkey_dict["keyid"]]
+s_opa.pubkeys = [pubkey_dict["keyid"].keyid]
 s_opa.add_material_rule_from_string("MATCH terraformplan.json WITH PRODUCTS FROM create-terraformplan-json")
 s_opa.add_material_rule_from_string("ALLOW tf.rego")
 s_opa.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
