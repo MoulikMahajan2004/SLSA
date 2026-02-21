@@ -140,6 +140,14 @@ jobs:
             --products opa_result.txt \
             -- bash -lc "true"
 
+
+
+      - name: creating the .link folder check in pipeline
+        # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
+        run: |
+         pwd
+         cd .github/workflows/intoto/links
+         ls
       # ---------- Verify against your layout ----------
       - name: in-toto verify (gate)
         working-directory: ./github/workflows/intoto
