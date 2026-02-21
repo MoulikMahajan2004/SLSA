@@ -150,9 +150,9 @@ jobs:
          ls
       # ---------- Verify against your layout ----------
       - name: in-toto verify (gate)
-        working-directory: ./github/workflows/intoto
+        
         run: |
-          ls -la intoto/links || true
+          cd .github/workflows/intoto
           in-toto-verify \
             --layout root.layout \
             --link-dir ./links \
