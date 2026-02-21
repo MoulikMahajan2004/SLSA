@@ -1,0 +1,258 @@
+{
+ "signatures": [],
+ "signed": {
+  "_type": "layout",
+  "expires": "2026-06-22T01:06:56Z",
+  "inspect": [
+   {
+    "_type": "inspection",
+    "expected_materials": [
+     [
+      "MATCH",
+      "tfplan.binary",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "terraform-plan"
+     ]
+    ],
+    "expected_products": [],
+    "name": "verify-json",
+    "run": [
+     "terraform",
+     "show",
+     "-json",
+     "tfplan.binary"
+    ]
+   },
+   {
+    "_type": "inspection",
+    "expected_materials": [],
+    "expected_products": [],
+    "name": "sigstore-verify-inspection",
+    "run": [
+     "cat",
+     "sigstore_verify.txt"
+    ]
+   }
+  ],
+  "keys": {},
+  "readme": "",
+  "steps": [
+   {
+    "_type": "step",
+    "expected_command": [],
+    "expected_materials": [
+     [
+      "ALLOW",
+      "*"
+     ]
+    ],
+    "expected_products": [
+     [
+      "CREATE",
+      ".terraform/*"
+     ],
+     [
+      "CREATE",
+      ".terraform.lock.hcl"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "name": "terraform-init",
+    "pubkeys": [
+     "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1"
+    ],
+    "threshold": 1
+   },
+   {
+    "_type": "step",
+    "expected_command": [],
+    "expected_materials": [
+     [
+      "MATCH",
+      "*",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "terraform-init"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "expected_products": [
+     [
+      "CREATE",
+      "tfplan.binary"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "name": "terraform-plan",
+    "pubkeys": [
+     "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1"
+    ],
+    "threshold": 1
+   },
+   {
+    "_type": "step",
+    "expected_command": [],
+    "expected_materials": [
+     [
+      "MATCH",
+      "tfplan.binary",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "terraform-plan"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "expected_products": [
+     [
+      "CREATE",
+      "tfplan.binary.sigstore.json"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "name": "sigstore-sign",
+    "pubkeys": [
+     "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1"
+    ],
+    "threshold": 1
+   },
+   {
+    "_type": "step",
+    "expected_command": [],
+    "expected_materials": [
+     [
+      "MATCH",
+      "tfplan.binary",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "terraform-plan"
+     ],
+     [
+      "MATCH",
+      "tfplan.binary.sigstore.json",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "sigstore-sign"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "expected_products": [
+     [
+      "CREATE",
+      "sigstore_verify.txt"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "name": "sigstore-verify",
+    "pubkeys": [
+     "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1"
+    ],
+    "threshold": 1
+   },
+   {
+    "_type": "step",
+    "expected_command": [],
+    "expected_materials": [
+     [
+      "MATCH",
+      "tfplan.binary",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "terraform-plan"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "expected_products": [
+     [
+      "CREATE",
+      "terraformplan.json"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "name": "create-terraformplan-json",
+    "pubkeys": [
+     "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1"
+    ],
+    "threshold": 1
+   },
+   {
+    "_type": "step",
+    "expected_command": [],
+    "expected_materials": [
+     [
+      "MATCH",
+      "terraformplan.json",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "create-terraformplan-json"
+     ],
+     [
+      "ALLOW",
+      "tf.rego"
+     ],
+     [
+      "MATCH",
+      "tfplan.binary",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "terraform-plan"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "expected_products": [
+     [
+      "CREATE",
+      "opa_result.txt"
+     ],
+     [
+      "DISALLOW",
+      "*"
+     ]
+    ],
+    "name": "opa-policy",
+    "pubkeys": [
+     "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1"
+    ],
+    "threshold": 1
+   }
+  ]
+ }
+}

@@ -142,11 +142,12 @@ jobs:
 
       # ---------- Verify against your layout ----------
       - name: in-toto verify (gate)
+        working-directory: ./github/workflows/intoto
         run: |
           ls -la intoto/links || true
           in-toto-verify \
-            --layout intoto/root.layout \
-            --link-dir intoto/links \
+            --layout root.layout \
+            --link-dir ./links \
             -v
 
       # Upload plan + evidence so apply job can reuse exact artifacts
