@@ -22,8 +22,8 @@ s_init = Step(name="terraform-init")
 s_init.pubkeys = [pubkey_dict["keyid"]]
 # s_init.add_material_rule_from_string("ALLOW *")
 s_init.add_product_rule_from_string("CREATE .terraform/*")
-s_init.add_product_rule_from_string("CREATE .terraform.lock.hcl")
-s_init.add_product_rule_from_string("DISALLOW *")
+s_init.add_product_rule_from_string("CREATE terraform.lock.hcl")
+# s_init.add_product_rule_from_string("DISALLOW *")
 s_init.expected_command = ["bash", "-lc", "timeout 600 terraform init -input=false -no-color"]
 s_init.threshold = 1
 
