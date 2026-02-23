@@ -31,10 +31,9 @@ s_init.threshold = 1
 s_plan = Step(name="terraform-plan")
 s_plan.pubkeys = [pubkey_dict["keyid"]]
 s_plan.add_material_rule_from_string("MATCH * WITH PRODUCTS FROM terraform-init")
-s_plan.add_material_rule_from_string("DISALLOW *")
-s_plan.add_product_rule_from_string("ALLOW tfplan.binary")
-s_plan.add_product_rule_from_string("DISALLOW *")
 s_plan.expected_command = ["terraform plan -out=tfplan.binary -input=false"]
+s_plan.add_product_rule_from_string("CREATE tfplan.binary")
+s_plan.add_product_rule_from_string("DISALLOW *")
 s_plan.threshold = 1
 
 # --- sigstore-sign ---
