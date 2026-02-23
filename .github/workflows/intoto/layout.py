@@ -75,13 +75,16 @@ s_opa.add_product_rule_from_string("DISALLOW *")
 s_opa.threshold = 1
 
 inspection = Inspection(name="verify-json")
-inspection.set_run_from_string("terraform show -json tfplan.binary")
+inspection.set_run_from_string("terraform show -json tfplan.binary > /dev/null ")
 inspection.add_material_rule_from_string(
     "MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan"
 )
 
 sigstoreinspection = Inspection(name="sigstore-verify-inspection")
 sigstoreinspection.set_run_from_string("cat sigstore_verify.txt")
+sigstoreinspection.add_material_rule_from_string(
+    "MATCH sigstore_verify.txt WITH PRODUCTS FROM sigstore-verify"
+)
 
 # Add steps and inspections to layout
 layout.steps = [s_init, s_plan, s_sig_sign, s_sig_verify, s_json, s_opa]
