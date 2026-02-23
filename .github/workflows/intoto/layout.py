@@ -41,6 +41,7 @@ s_sig_sign = Step(name="sigstore-sign")
 s_sig_sign.pubkeys = [pubkey_dict["keyid"]]
 s_sig_sign.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
 s_sig_sign.add_product_rule_from_string("CREATE tfplan.binary.sigstore.json")
+s_sig_sign.expected_command = ["sigstore sign terra/tfplan.binary "]
 s_sig_sign.threshold = 1
 
 # --- sigstore-verify ---
