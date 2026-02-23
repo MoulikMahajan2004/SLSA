@@ -20,9 +20,9 @@ layout.add_functionary_key(pubkey_dict)
 # --- terraform-init ---
 s_init = Step(name="terraform-init")
 s_init.pubkeys = [pubkey_dict["keyid"]]
-s_init.add_material_rule_from_string("ALLOW *")
-s_init.add_product_rule_from_string("ALLOW .terraform/*")
-s_init.add_product_rule_from_string("ALLOW .terraform.lock.hcl")
+# s_init.add_material_rule_from_string("ALLOW *")
+s_init.add_product_rule_from_string("CREATE .terraform/*")
+s_init.add_product_rule_from_string("CREATE .terraform.lock.hcl")
 s_init.add_product_rule_from_string("DISALLOW *")
 s_init.expected_command = ["bash", "-lc", "timeout 600 terraform init -input=false -no-color"]
 s_init.threshold = 1
@@ -42,14 +42,16 @@ s_sig_sign.pubkeys = [pubkey_dict["keyid"]]
 s_sig_sign.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
 s_sig_sign.add_product_rule_from_string("CREATE tfplan.binary.sigstore.json")
 s_sig_sign.threshold = 1
+
 # --- sigstore-verify ---
 s_sig_verify = Step(name="sigstore-verify")
 s_sig_verify.pubkeys = [pubkey_dict["keyid"]]
 s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
 s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary.sigstore.json WITH PRODUCTS FROM sigstore-sign")
-s_sig_verify.add_material_rule_from_string("DISALLOW *")
 s_sig_verify.add_product_rule_from_string("CREATE sigstore_verify.txt")
+s_sig_verify.add_material_rule_from_string("DISALLOW *")
 s_sig_verify.threshold = 1
+
 # --- create-terraformplan-json ---
 s_json = Step(name="create-terraformplan-json")
 s_json.pubkeys = [pubkey_dict["keyid"]]
