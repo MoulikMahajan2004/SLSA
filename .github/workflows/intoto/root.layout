@@ -2,12 +2,12 @@
  "signatures": [
   {
    "keyid": "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1",
-   "sig": "08ad3a2a2e2d347059c1ec3a3265d0897c76a67650d47e07a6eb23f48b078407093c0f367bfb0f695eca6cb80506afb0ecc7f8451913ec4be906b28b33ceab9cd946f3c377518298ab902a35f13c9c200b9f08d2339d114a7c0c1bf67afe7646cacfe50ce3022953385d5044181bce31a77149b929613b4964d029a3338dff154e99eb35770492344d520d77c3b898962fb70b8a6a6a23e670e9a46663eb0222a0df876494ecfbea4539130e2a219e505caf850f8bb52262c9fceb45027ac67b98d1e0a56b3b40a9cf35dc6571da033342498f3cd82cde43b38cff5a51bdfa86eb3ca3281d38c58c1fc4b6663306099f6bca1e0a0b9f40b5244f6c8ae5b7c551a23daf7c14e054248845fd3d1a6bed0e93a49b6dfa8f96becbfeadfcc11a41cc97cf6bb1377513141202b61e7cc505c5649ef588c7ff8f6cfac45a1e9ef3753530151b9e9888afc5119c7caa322bc27d7ec1877f5da134ad99623c64c0551e575c437ec28249e28cbc856084c1bc908ed7ea9146b25cba37a31579b690f6f97a"
+   "sig": "53d254abdbb2d252af2f4f20958ac6c0a3509adccb1a19c69c4eb17d6447d1ec23e678a792fe9e65975e07ae599d3d5f2ad37f11f22746332924e26c66ffdd752b47f655bf9edd2a50f33e8b1565043e2f72d9b6314580561c801a91c174c833e89d82b33fcacfc1661095c21b3c972560f979d966d8d6ba3510a33a6623bf1a865ee3ea12efa31ca772d334f23919d118b2f84be0995a2e6a76ef2fc2c7cbe0cdeb7930978b70d95bd3acae846605bac0d77267715be34227269ed57f9277a83b17fecf75047542542bcf718851609b5a9f9644f0dc0cfc225a0544a4b0d3c82f0ec88d97d0aa712da566d7c17c43cd0b146835f704b749fdf1ccee6850792fbd10162004af1b2293196da2c9566334b0cc8f3ecfa976b26aba9cdf98f672a1e751ec1360109f711576ecfc60dc17e2a9867e72e2618259a39d97abb0a1530d06460c0715e35bfda56a11279d4916eef2e662570b95a9bdcc418a755eba30d3b72e6e5599eee02440d2335beedcb4d33eb4a02f95591a42cb73ce00fdf3f9c8"
   }
  ],
  "signed": {
   "_type": "layout",
-  "expires": "2026-06-24T02:19:41Z",
+  "expires": "2026-06-24T02:22:07Z",
   "inspect": [
    {
     "_type": "inspection",
@@ -141,19 +141,19 @@
     "expected_materials": [
      [
       "MATCH",
-      "tfplan.binary.sigstore.json",
-      "WITH",
-      "PRODUCTS",
-      "FROM",
-      "sigstore-sign"
-     ],
-     [
-      "MATCH",
       "tfplan.binary",
       "WITH",
       "PRODUCTS",
       "FROM",
       "terraform-plan"
+     ],
+     [
+      "MATCH",
+      "tfplan.binary.sigstore.json",
+      "WITH",
+      "PRODUCTS",
+      "FROM",
+      "sigstore-sign"
      ],
      [
       "DISALLOW",
