@@ -48,6 +48,7 @@ s_sig_sign.threshold = 1
 s_sig_verify = Step(name="sigstore-verify")
 s_sig_verify.pubkeys = [pubkey_dict["keyid"]]
 s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary.sigstore.json WITH PRODUCTS FROM sigstore-sign")
+s_sig_verify.add_product_rule_from_string("ALLOW tfplan.binary.sigstore.json")
 s_sig_verify.add_product_rule_from_string("CREATE sigstore_verify.txt")
 s_sig_verify.add_material_rule_from_string("DISALLOW *")
 s_sig_verify.threshold = 1
