@@ -208,10 +208,11 @@ jobs:
       # Re-verify in apply job before changing infra
       - name: Re-verify in-toto (block apply if fail)
         run: |
-          in-toto-verify \
-            --layout intoto/root.layout \
-            --link-dir intoto/links \
-            -v
+         in-toto-verify \
+           --layout .github/workflows/intoto/root.layout \
+           --verification-keys .github/workflows/intoto/keys/ci.pub \
+           --link-dir .github/workflows/intoto/links \
+           -v
 
       - name: Terraform Init
         working-directory: terra
