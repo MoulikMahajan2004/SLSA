@@ -2,12 +2,12 @@
  "signatures": [
   {
    "keyid": "a2c0b6ba8edb119adfb74f755d5b4a179e4301c5eefbfeace63951d55e5441d1",
-   "sig": "8eb6e891f1feb8dd6cf055b46186e7f126a022a025d2b791ed2de87d156c8dea635a3aaefa024eb44530c8d5fd87fb7c6143be57bc237c0de2f6e4a3d25a4dafe407fc882ee8096d8d4145f98fb6323b6250cdabf397b565e4b79b2dab483d2ad9c2f9df03866ce20494d4ef21465c5071cd1bab5f8057f2cf2f286b8c74eabe3a54def3a3bc0ebe425b6580d3a021f32d409d11c08db9fb9645db85df1bce47a313cef8578366b35169a0fccfdb984e2e97a68a33bb278ea4a98747ee6c60079dfd3c6373c56577e11014aa371e3afea78580adc004e9bd155490f3133d6121634a84e32e295e06f3f47d9b2248a33d7d768abe120a6eb72e323b9e7d8f7086800e5dfb5c6191ce578fe649ef6715c07654f357b027d4ce80b6fa848af90eb192ba75f1e2b8d1ed2dce9245ad7d25268c3c7162d462f7bd634739f8ea9d601cc5baa1e4fed75c63ec12d018bdac94a10a2d127169a71fabd5d3a1ab569d2b1fa4ca14362cef79003276202e4910e475a55abd7f97c5f649ce028bba608816af"
+   "sig": "002cfc18f55580b1613be3bba1dfec31baffb63958775173a6f11be2b6a166defc0727be20d498be9d19102c75938ac4ddb4776f80d91e1b84be884dc44097b21c7de2547b082937dc74cd0d64fe3f77df4e2bb4c44d619a98c40de310bddaf8686c7bfb0e8631ac0f323faca74cb20c55d869fbabac93ce32428e6c8f0d055cf235de2a965825644e71cb9b69bd8a19f717b477501fffc1ae7b0d8239073df61d30580966c1e1d48ee1f17b75018f3782e921f7dcd34fe68a7599fa843058c112f9a8a884c438381f77b99addfa11dc0a961403ce4488546957e5a4bb1f48ff9b7cea74e01ae9d1b7c824ff5b2c45f9d8dce17de202b5eef0d91034a260a28e8cc03f43e182fbe4845226c80b88dd8e67e4c45853a13f5bc7ae9425810e3af4e382d967331b9167c2a280532b2841376c78af32cdc61ae041eeb9e421e741d6f41f32ea5103fc5f1be72ae70d8c0ee83bb533e1edd9fa1b2b5f4d0a4c2996e7a22f79616e926cdf1c77b8b3c1535a3b560be57e4c0cf67bf32469c98df0692a"
   }
  ],
  "signed": {
   "_type": "layout",
-  "expires": "2026-06-24T01:15:48Z",
+  "expires": "2026-06-24T01:23:56Z",
   "inspect": [
    {
     "_type": "inspection",
@@ -88,7 +88,9 @@
    },
    {
     "_type": "step",
-    "expected_command": [],
+    "expected_command": [
+     "terraform plan -out=tfplan.binary -input=false"
+    ],
     "expected_materials": [
      [
       "MATCH",
@@ -105,7 +107,7 @@
     ],
     "expected_products": [
      [
-      "CREATE",
+      "ALLOW",
       "tfplan.binary"
      ],
      [
@@ -130,20 +132,12 @@
       "PRODUCTS",
       "FROM",
       "terraform-plan"
-     ],
-     [
-      "DISALLOW",
-      "*"
      ]
     ],
     "expected_products": [
      [
       "CREATE",
       "tfplan.binary.sigstore.json"
-     ],
-     [
-      "DISALLOW",
-      "*"
      ]
     ],
     "name": "sigstore-sign",
@@ -181,10 +175,6 @@
      [
       "CREATE",
       "sigstore_verify.txt"
-     ],
-     [
-      "DISALLOW",
-      "*"
      ]
     ],
     "name": "sigstore-verify",
@@ -204,10 +194,6 @@
       "PRODUCTS",
       "FROM",
       "terraform-plan"
-     ],
-     [
-      "DISALLOW",
-      "*"
      ]
     ],
     "expected_products": [
