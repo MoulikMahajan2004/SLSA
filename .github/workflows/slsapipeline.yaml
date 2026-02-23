@@ -204,7 +204,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install in-toto
-
+      - name: creating the .link folder check in pipeline in apply section
+        # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
+        run: |
+         pwd
+         cd .github/workflows/intoto/links
+         ls
       # Re-verify in apply job before changing infra
       - name: Re-verify in-toto (block apply if fail)
         run: |
