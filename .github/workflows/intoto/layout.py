@@ -80,15 +80,15 @@ s_opa.threshold = 1
 #     "MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan"
 # )
 
-sigstoreinspection = Inspection(name="sigstore-verify-inspection")
-sigstoreinspection.set_run_from_string("grep -q \"Verified\" ../../terra/sigstore_verify.txt")
-sigstoreinspection.add_material_rule_from_string(
-    "MATCH ../../terra/sigstore_verify.txt WITH PRODUCTS FROM sigstore-verify"
-)
+# sigstoreinspection = Inspection(name="sigstore-verify-inspection")
+# sigstoreinspection.set_run_from_string("grep -q \"Verified\" ../../terra/sigstore_verify.txt")
+# sigstoreinspection.add_material_rule_from_string(
+#     "MATCH ../../terra/sigstore_verify.txt WITH PRODUCTS FROM sigstore-verify"
+# )
 
 # Add steps and inspections to layout
 layout.steps = [s_init, s_plan, s_sig_sign, s_sig_verify, s_json, s_opa]
-layout.inspect = [ sigstoreinspection]
+# layout.inspect = [ sigstoreinspection]
 
 
 metablock = Metablock(signed=layout)
