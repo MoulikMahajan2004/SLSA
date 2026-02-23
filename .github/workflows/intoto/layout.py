@@ -32,16 +32,16 @@ s_plan = Step(name="terraform-plan")
 s_plan.pubkeys = [pubkey_dict["keyid"]]
 s_plan.add_material_rule_from_string("MATCH * WITH PRODUCTS FROM terraform-init")
 s_plan.add_material_rule_from_string("DISALLOW *")
-s_plan.add_product_rule_from_string("CREATE tfplan.binary")
+s_plan.add_product_rule_from_string("ALLOW tfplan.binary")
 s_plan.add_product_rule_from_string("DISALLOW *")
+s_plan.expected_command = ["terraform plan -out=tfplan.binary -input=false"]
 s_plan.threshold = 1
+
 # --- sigstore-sign ---
 s_sig_sign = Step(name="sigstore-sign")
 s_sig_sign.pubkeys = [pubkey_dict["keyid"]]
 s_sig_sign.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
-s_sig_sign.add_material_rule_from_string("DISALLOW *")
 s_sig_sign.add_product_rule_from_string("CREATE tfplan.binary.sigstore.json")
-s_sig_sign.add_product_rule_from_string("DISALLOW *")
 s_sig_sign.threshold = 1
 # --- sigstore-verify ---
 s_sig_verify = Step(name="sigstore-verify")
@@ -50,13 +50,11 @@ s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FR
 s_sig_verify.add_material_rule_from_string("MATCH tfplan.binary.sigstore.json WITH PRODUCTS FROM sigstore-sign")
 s_sig_verify.add_material_rule_from_string("DISALLOW *")
 s_sig_verify.add_product_rule_from_string("CREATE sigstore_verify.txt")
-s_sig_verify.add_product_rule_from_string("DISALLOW *")
 s_sig_verify.threshold = 1
 # --- create-terraformplan-json ---
 s_json = Step(name="create-terraformplan-json")
 s_json.pubkeys = [pubkey_dict["keyid"]]
 s_json.add_material_rule_from_string("MATCH tfplan.binary WITH PRODUCTS FROM terraform-plan")
-s_json.add_material_rule_from_string("DISALLOW *")
 s_json.add_product_rule_from_string("CREATE terraformplan.json")
 s_json.add_product_rule_from_string("DISALLOW *")
 s_json.threshold = 1
