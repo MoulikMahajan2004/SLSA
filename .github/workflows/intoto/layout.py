@@ -81,9 +81,9 @@ s_opa.threshold = 1
 # )
 
 sigstoreinspection = Inspection(name="sigstore-verify-inspection")
-sigstoreinspection.set_run_from_string("grep -q \"Verified\" sigstore_verify.txt")
+sigstoreinspection.set_run_from_string("grep -q \"Verified\" ../../terra/sigstore_verify.txt")
 sigstoreinspection.add_material_rule_from_string(
-    "MATCH sigstore_verify.txt WITH PRODUCTS FROM sigstore-verify"
+    "MATCH ../../terra/sigstore_verify.txt WITH PRODUCTS FROM sigstore-verify"
 )
 
 # Add steps and inspections to layout
