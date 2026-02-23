@@ -174,8 +174,8 @@ jobs:
             terra/sigstore_verify.txt
             terra/terraformplan.json
             terra/opa_result.txt
-            in-toto/root.layout
-            in-toto/links/**
+            intoto/root.layout
+            intoto/links/**
 
   apply:
     needs: plan
