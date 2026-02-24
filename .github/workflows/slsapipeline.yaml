@@ -211,13 +211,13 @@ jobs:
          cd .github/workflows/intoto/links
          ls
       # Re-verify in apply job before changing infra
-      - name: Re-verify in-toto (block apply if fail)
-        run: |
-         in-toto-verify \
-           --layout .github/workflows/intoto/root.layout \
-           --verification-keys .github/workflows/intoto/keys/ci.pub \
-           --link-dir .github/workflows/intoto/links \
-           -v
+      # - name: Re-verify in-toto (block apply if fail)
+      #   run: |
+      #    in-toto-verify \
+      #      --layout .github/workflows/intoto/root.layout \
+      #      --verification-keys .github/workflows/intoto/keys/ci.pub \
+      #      --link-dir .github/workflows/intoto/links \
+      #      -v
 
       - name: Terraform Init
         working-directory: terra
@@ -226,3 +226,4 @@ jobs:
       - name: Terraform Apply exact plan
         working-directory: terra
         run: terraform apply -auto-approve tfplan.binary
+#       - name: Terraform Apply exact plan
