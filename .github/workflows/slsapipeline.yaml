@@ -78,6 +78,10 @@ jobs:
            --products .terraform .terraform.lock.hcl \
            -- bash -lc 'terraform init -input=false -no-color'
       ##
+      - name: prewarming plan (outside in-toto)
+        working-directory: terra
+        run: terraform plan -out=tfplan.binary -input=false
+
       - name: Terraform Plan in-toto
         working-directory: terra
         run: |
