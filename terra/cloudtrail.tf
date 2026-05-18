@@ -2,7 +2,7 @@
 data "aws_caller_identity" "current" {}
 #creating the s3 bcuket with name cloud trail to sotre the logs
 resource "aws_s3_bucket" "cloudtrail_logs" {
-  bucket = "cloudtrail-bucket-logs"
+  bucket = "cloudtraillogbucket.01"
 
   tags = {
     Name = "secure-cicd-cloudtrail-logs"
