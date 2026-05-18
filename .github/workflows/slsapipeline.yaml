@@ -16,7 +16,7 @@ permissions:
   id-token: write
 # --------------------------
 # setting up the branch for the main 
-# job 
+# job  #
 jobs: 
   # setting up the job name it does not matter we keep we can keep it like pipeline job or anything else 
   plan: 
