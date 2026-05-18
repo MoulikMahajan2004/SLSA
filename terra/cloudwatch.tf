@@ -12,7 +12,7 @@ resource "aws_cloudwatch_log_group" "cloudtrail_log_group" {
 }
 #creating the alarm for ec2 cpu ustilization
 resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
-  alarm_name          = "secure-cicd-ec2-high-cpu"
+  alarm_name          = "secure-cicd-ec2-high-cpu-${random_id.log_suffix.hex}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "CPUUtilization"
