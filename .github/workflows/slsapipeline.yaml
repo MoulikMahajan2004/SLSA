@@ -76,8 +76,8 @@ jobs:
         working-directory: terra
         run: |
           in-toto-run \
+           --run-timeout 780\
            --step-name terraform-init \
-           --inspection-timeout 300 \
            --signing-key "../.github/workflows/intoto/keys/ci.key" \
            --metadata-directory "../.github/workflows/intoto/links" \
            --materials . \
