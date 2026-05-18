@@ -69,12 +69,12 @@ jobs:
         working-directory: terra
         run: |
           in-toto-run \
+           --timeout 600 \
            --step-name terraform-init \
            --signing-key "../.github/workflows/intoto/keys/ci.key" \
            --metadata-directory "../.github/workflows/intoto/links" \
            --materials . \
            --products .terraform .terraform.lock.hcl \
-           --timeout 600 \
            -- bash -lc 'terraform init -input=false -no-color'
       ##
       - name: Terraform Plan in-toto
