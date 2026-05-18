@@ -22,8 +22,19 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
   threshold           = 2
 
   alarm_description = "Monitors abnormal EC2 CPU utilization"
-
+  alarm_actions = [aws_sns_topic.security_alerts.arn]
+  ok_actions    = [aws_sns_topic.security_alerts.arn]
   dimensions = {
     InstanceId = aws_instance.tfinstance.id
   }
+}
+# TRIGGERING ALRAM TO SEND ME AN EMAIL 
+resource "aws_sns_topic" "security_alerts" {
+  name = "secure-cicd-alerts-${random_id.log_suffix.hex}"
+}
+
+resource "aws_sns_topic_subscription" "email_alert" {
+  topic_arn = aws_sns_topic.security_alerts.arn
+  protocol  = "email"
+  endpoint  = "moulikmahajan2004@gmail.com"
 }
