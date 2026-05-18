@@ -75,9 +75,6 @@ jobs:
            --materials . \
            --products .terraform .terraform.lock.hcl \
            -- bash -lc 'timeout 600 terraform init -input=false -no-color'
-      - name: Terraform Destroy Existing Infrastructure
-        working-directory: terra
-        run: terraform destroy -auto-approve
       ##
       - name: Terraform Plan in-toto
         working-directory: terra
