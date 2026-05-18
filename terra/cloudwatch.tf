@@ -1,6 +1,9 @@
 #using the cloud watch to monitor the logs and set alarms for any abnormal activities
+resource "random_id" "log_suffix" {
+  byte_length = 4
+}
 resource "aws_cloudwatch_log_group" "cloudtrail_log_group" {
-  name              = "/aws/cloudtrail/secure-cicd"
+  name              = "/aws/cloudtrail/secure-cicd-${random_id.log_suffix.hex}"
   retention_in_days = 30
 
   tags = {
