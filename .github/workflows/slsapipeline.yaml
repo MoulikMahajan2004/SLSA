@@ -216,13 +216,14 @@ jobs:
       #      --verification-keys .github/workflows/intoto/keys/ci.pub \
       #      --link-dir .github/workflows/intoto/links \
       #      -v
-      - name: Terraform Destroy Existing Infrastructure
-        working-directory: terra
-        run: terraform destroy -auto-approve
+    
       - name: Terraform Init
         working-directory: terra
         run: terraform init -input=false
 
+      - name: Terraform Destroy Existing Infrastructure
+        working-directory: terra
+        run: terraform destroy -auto-approve
       - name: Terraform Apply exact plan
         working-directory: terra
         run: terraform apply -auto-approve tfplan.binary
