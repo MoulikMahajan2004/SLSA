@@ -60,10 +60,15 @@ jobs:
           ls
       #
 
-      - name: Pre-warm Terraform init (outside in-toto)
-        working-directory: terra
-        run: terraform init -input=false -no-color
-
+      # - name: Pre-warm Terraform init (outside in-toto)
+      #   working-directory: terra
+      #   run: terraform init -input=false -no-color
+      - name: Patch in-toto timeout        # ← add this right here
+        run: |
+          FILE=$(python -c "import in_toto.runlib as m; import inspect; print(inspect.getfile(m))")
+          echo "Patching: $FILE"
+          sed -i 's/timeout=10/timeout=300/g' $FILE
+          grep -n "timeout" $FILE
       ###3##
       #4444
       # ---------- in-toto steps (produce .link evidence) ----------
