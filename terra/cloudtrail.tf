@@ -8,6 +8,7 @@ resource "aws_s3_bucket" "cloudtrail_logs" {
     Name = "secure-cicd-cloudtrail-logs"
   }
 }
+#
 
 #adding the versioning to the bucket so that I can keep the track of the changes in the logs
 resource "aws_s3_bucket_versioning" "cloudtrail_versioning" {
