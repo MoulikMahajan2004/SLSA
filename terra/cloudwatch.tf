@@ -16,7 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
   namespace           = "AWS/EC2"
   period              = 300
   statistic           = "Average"
-  threshold           = 80
+  threshold           = 2
 
   alarm_description = "Monitors abnormal EC2 CPU utilization"
 
