@@ -60,7 +60,9 @@ jobs:
           ls
       #
 
-
+      - name: Pre-warm Terraform init (outside in-toto)
+        working-directory: terra
+        run: terraform init -input=false -no-color
 
       ###3##
       #4444
