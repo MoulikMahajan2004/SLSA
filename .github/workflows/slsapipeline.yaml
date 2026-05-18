@@ -74,6 +74,7 @@ jobs:
            --metadata-directory "../.github/workflows/intoto/links" \
            --materials . \
            --products .terraform .terraform.lock.hcl \
+           --timeout 600 \
            -- bash -lc 'terraform init -input=false -no-color'
       ##
       - name: Terraform Plan in-toto
