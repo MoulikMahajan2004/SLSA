@@ -2,7 +2,7 @@
 data "aws_caller_identity" "current" {}
 #creating the s3 bcuket with name cloud trail to sotre the logs
 resource "aws_s3_bucket" "cloudtrail_logs" {
-  bucket = "secure-cicd-cloudtrail-${data.aws_caller_identity.current.account_id}-${random_id.log_suffix.hex}"
+  bucket = "cloudtrail-bucket-logs"
 
   tags = {
     Name = "secure-cicd-cloudtrail-logs"
@@ -74,7 +74,7 @@ resource "aws_s3_bucket_policy" "cloudtrail_bucket_policy" {
 
 #creating the cloud trail logs to capture the events and store in the s3 bucket
 resource "aws_cloudtrail" "secure_cicd_trail" {
-  name                          = "secure-cicd-cloudtrail-${random_id.log_suffix.hex}"
+  name                          = "cloudtrail-secure"
   s3_bucket_name                = aws_s3_bucket.cloudtrail_logs.id
   include_global_service_events = true
   is_multi_region_trail         = true

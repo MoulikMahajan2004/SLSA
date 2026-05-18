@@ -3,7 +3,7 @@ resource "random_id" "log_suffix" {
   byte_length = 4
 }
 resource "aws_cloudwatch_log_group" "cloudtrail_log_group" {
-  name              = "/aws/cloudtrail/secure-cicd-${random_id.log_suffix.hex}"
+  name              = "/aws/cloudtrail/cloudtrail-logs"
   retention_in_days = 30
 
   tags = {
@@ -12,7 +12,7 @@ resource "aws_cloudwatch_log_group" "cloudtrail_log_group" {
 }
 #creating the alarm for ec2 cpu ustilization
 resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
-  alarm_name          = "secure-cicd-ec2-high-cpu-${random_id.log_suffix.hex}"
+  alarm_name          = "ec2-cpu-alarm"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "CPUUtilization"
@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu_alarm" {
 }
 # TRIGGERING ALRAM TO SEND ME AN EMAIL 
 resource "aws_sns_topic" "security_alerts" {
-  name = "secure-cicd-alerts-${random_id.log_suffix.hex}"
+  name = "alarm-trigger-sns"
 }
 
 resource "aws_sns_topic_subscription" "email_alert" {

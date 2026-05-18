@@ -21,7 +21,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ap-southeast-2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -192,7 +192,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ap-southeast-2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -218,7 +218,8 @@ jobs:
     
       - name: Terraform Init
         working-directory: terra
-        run: terraform init -input=false
+        run: terraform init -reconfigure -input=false
+         # terraform init -input=false
 
       - name: Terraform Apply exact plan
         working-directory: terra
