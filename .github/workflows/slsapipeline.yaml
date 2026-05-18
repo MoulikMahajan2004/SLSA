@@ -3,7 +3,7 @@ name: tfpipeline-intoto
 on:
   pull_request:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -44,39 +44,39 @@ jobs:
           INTOTO_CI_KEY: ${{ secrets.IN_TOTO_CI_KEY_B64}}
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
-         pwd
-         cd .github/workflows/intoto/keys
-         echo "${{env.INTOTO_CI_KEY}}" > ci.key
-         cat ci.key
-         chmod 600 ci.key
-         ls
-#
+          pwd
+          cd .github/workflows/intoto/keys
+          echo "${{env.INTOTO_CI_KEY}}" > ci.key
+          cat ci.key
+          chmod 600 ci.key
+          ls
+      #
       - name: checking weather key is loaded in the folder or not
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
-         pwd
-         cd .github/workflows/intoto/keys
-         cat ci.key
-         ls
-#
-        
-          
-          
- ###3##
-#4444
+          pwd
+          cd .github/workflows/intoto/keys
+          cat ci.key
+          ls
+      #
+
+
+
+      ###3##
+      #4444
       # ---------- in-toto steps (produce .link evidence) ----------
       - name: Terraform Init (in-toto)
         working-directory: terra
         run: |
-            in-toto-run \
-             --step-name terraform-init \
-             --signing-key "../.github/workflows/intoto/keys/ci.key" \
-             --metadata-directory "../.github/workflows/intoto/links" \
-             --materials . \
-             --products .terraform .terraform.lock.hcl \
-             -- bash -lc 'timeout 600 terraform init -input=false -no-color'
+          in-toto-run \
+           --step-name terraform-init \
+           --signing-key "../.github/workflows/intoto/keys/ci.key" \
+           --metadata-directory "../.github/workflows/intoto/links" \
+           --materials . \
+           --products .terraform .terraform.lock.hcl \
+           -- bash -lc 'timeout 600 terraform init -input=false -no-color'
 
-##
+      ##
       - name: Terraform Plan in-toto
         working-directory: terra
         run: |
@@ -140,29 +140,27 @@ jobs:
             --products opa_result.txt \
             -- bash -lc "true"
 
-
-
       - name: creating the .link folder check in pipeline
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
-         pwd
-         cd .github/workflows/intoto/links
-         ls
+          pwd
+          cd .github/workflows/intoto/links
+          ls
       # ---------- Verify against your layout ----------
       - name: in-toto verify (gate)
-        
+
         run: |
           in-toto-verify \
            --layout .github/workflows/intoto/root.layout \
            --verification-keys .github/workflows/intoto/keys/ci.pub \
            --link-dir .github/workflows/intoto/links \
            -v
-      
-       # in-toto-verify \
-       #   --layout root.layout \
-       #   --layout-keys "./keys/ci.pub" \
-       #   --link-dir ./links \
-       #   -
+
+      # in-toto-verify \
+      #   --layout root.layout \
+      #   --layout-keys "./keys/ci.pub" \
+      #   --link-dir ./links \
+      #   -
       # Upload plan + evidence so apply job can reuse exact artifacts
       - name: Upload plan + evidence
         uses: actions/upload-artifact@v4
@@ -207,9 +205,9 @@ jobs:
       - name: creating the .link folder check in pipeline in apply section
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |
-         pwd
-         cd .github/workflows/intoto/links
-         ls
+          pwd
+          cd .github/workflows/intoto/links
+          ls
       # Re-verify in apply job before changing infra
       # - name: Re-verify in-toto (block apply if fail)
       #   run: |
@@ -218,7 +216,9 @@ jobs:
       #      --verification-keys .github/workflows/intoto/keys/ci.pub \
       #      --link-dir .github/workflows/intoto/links \
       #      -v
-
+      - name: Terraform Destroy Existing Infrastructure
+        working-directory: terra
+        run: terraform destroy -auto-approve
       - name: Terraform Init
         working-directory: terra
         run: terraform init -input=false
@@ -226,4 +226,5 @@ jobs:
       - name: Terraform Apply exact plan
         working-directory: terra
         run: terraform apply -auto-approve tfplan.binary
+
 #       - name: Terraform Apply exact plan
