@@ -16,7 +16,7 @@ layout = Layout()
 layout.set_relative_expiration(months=4)
 layout.add_functionary_key(pubkey_dict)
 #each part which is to be compared is reffered as step
-
+#test running the piepeline 
 # --- terraform-init ---
 s_init = Step(name="terraform-init")
 s_init.pubkeys = [pubkey_dict["keyid"]]
