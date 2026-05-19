@@ -145,7 +145,7 @@ jobs:
         working-directory: terra
         run: |
           set -o pipefail
-          opa eval -i terraformplan.json -d tf.rego 'data.pipeline' | tee opa_result.txt
+          opa eval -i terraformplan.json -d tf.rego 'data.pipeline' 
           in-toto-run \
             --step-name opa-policy \
             --signing-key "../.github/workflows/intoto/keys/ci.key" \
