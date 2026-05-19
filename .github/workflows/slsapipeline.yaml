@@ -142,6 +142,7 @@ jobs:
       - name: OPA policy check (in-toto)
         working-directory: terra
         run: |
+          set -o pipefail
           opa eval --fail-defined -i terraformplan.json -d tf.rego "data.pipeline.deny"| tee opa_result.txt
           in-toto-run \
             --step-name opa-policy \
