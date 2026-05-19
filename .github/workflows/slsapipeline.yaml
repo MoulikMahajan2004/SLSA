@@ -144,14 +144,15 @@ jobs:
         working-directory: terra
         run: |
 
-          opa eval --fail-defined -i terraformplan.json -d tf.rego "data.pipeline.deny"| tee opa_result.txt
+         
           in-toto-run \
             --step-name opa-policy \
             --signing-key "../.github/workflows/intoto/keys/ci.key" \
             --metadata-directory "../.github/workflows/intoto/links" \
             --materials terraformplan.json tf.rego tfplan.binary \
             --products opa_result.txt \
-            -- bash -lc "true"
+            -- bash -lc " opa eval --fail-defined -i terraformplan.json -d tf.rego "data.pipeline.deny"| tee opa_result.txt"
+
       - name: Notify SNS if Sigstore verification fails
         if: failure()
         run: |
