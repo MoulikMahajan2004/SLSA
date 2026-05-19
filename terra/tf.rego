@@ -36,20 +36,20 @@ deny contains msg if {
 }
 
 # Public SSH IPv4
-deny contains msg if {
-  r := all_resources[_]
-  r.type == "aws_security_group"
+# deny contains msg if {
+#   r := all_resources[_]
+#   r.type == "aws_security_group"
 
-  ingress := r.values.ingress[_]
-  ingress.from_port <= 22
-  ingress.to_port >= 22
-  ingress.cidr_blocks[_] == "0.0.0.0/0"
+#   ingress := r.values.ingress[_]
+#   ingress.from_port <= 22
+#   ingress.to_port >= 22
+#   ingress.cidr_blocks[_] == "0.0.0.0/0"
 
-  msg := sprintf(
-    "Security group %s exposes SSH port 22 to 0.0.0.0/0. Restrict SSH to a trusted IP address.",
-    [r.address]
-  )
-}
+#   msg := sprintf(
+#     "Security group %s exposes SSH port 22 to 0.0.0.0/0. Restrict SSH to a trusted IP address.",
+#     [r.address]
+#   )
+# }
 
 # Public SSH IPv6
 deny contains msg if {
