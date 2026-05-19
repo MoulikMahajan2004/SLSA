@@ -151,7 +151,13 @@ jobs:
             --materials terraformplan.json tf.rego tfplan.binary \
             --products opa_result.txt \
             -- bash -lc "true"
-
+      - name: Notify SNS if Sigstore verification fails
+        if: failure()
+        run: |
+            aws sns publish \
+             --topic-arn arn:aws:sns:ap-southeast-2:201727487182:alarm-trigger-sns \
+             --subject "CI/CD Security Alert: Artifact Verification Failed" \
+             --message "OPA POLICY FAIL THE RESOURCE IS IMPLEMENTED IS NOT ACCORDING TO STRUCTURE MAY COST HAVY PLEASE CHECK"
       - name: creating the .link folder check in pipeline
         # working-directory: /home/runner/work/SLSA/SLSA/.github/workflows/intoto/keys
         run: |

@@ -9,7 +9,7 @@ resource "aws_instance" "tfinstance" {
     Name = "tfinstance"
   }
 }
-
+#checking the test cmit strcutre 
 
 # resource "aws_instance" "tfinstance" {
 #   instance_type = "t3.micro"
