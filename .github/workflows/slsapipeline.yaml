@@ -138,12 +138,11 @@ jobs:
             --materials tfplan.binary \
             --products terraformplan.json \
             -- bash -lc "terraform show -json tfplan.binary > terraformplan.json"
-
+# opa eval -i terraformplan.json -d tf.rego 'data.pipeline' | tee opa_result.txt
       - name: OPA policy check (in-toto)
         working-directory: terra
         run: |
-          opa eval -i terraformplan.json -d tf.rego 'data.pipeline' | tee opa_result.txt
-
+          opa eval --fail-defined -i terraformplan.json -d tf.rego "data.pipeline.deny"| tee opa_result.txt
           in-toto-run \
             --step-name opa-policy \
             --signing-key "../.github/workflows/intoto/keys/ci.key" \
