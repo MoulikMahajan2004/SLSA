@@ -9,7 +9,7 @@ all_resources contains r if {
 all_resources contains r if {
   module := input.planned_values.root_module.child_modules[_]
   r := module.resources[_]
-}
+} 
 
 # EC2 instance type enforcement
 deny contains msg if {
