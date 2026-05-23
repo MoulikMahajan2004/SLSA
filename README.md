@@ -68,13 +68,10 @@ SSECURE SOFTWARE DELIVERY ARCHITECTURE/
 │   ├── cloudwatch.tf
 │   ├── sns.tf
 │   └── tf.rego
-│
 |
+├── workflow-Mechanism/
+│   └── software delivery secure mechanism.png
 │
-├── docs/
-│   └── architecture-diagram.png
-│
-|
 ├── .gitignore
 └── README.md
 ```
