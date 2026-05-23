@@ -24,30 +24,14 @@ deny contains msg if {
 }
 
 # Detect unmanaged EC2 resources
-deny contains msg if {
-  r := all_resources[_]
-  r.type == "aws_instance"
-  r.mode == "unmanaged"
-
-  msg := sprintf(
-    "Resource %s of type %s is unmanaged.",
-    [r.address, r.type]
-  )
-}
-
-# Public SSH IPv4
 # deny contains msg if {
 #   r := all_resources[_]
-#   r.type == "aws_security_group"
-
-#   ingress := r.values.ingress[_]
-#   ingress.from_port <= 22
-#   ingress.to_port >= 22
-#   ingress.cidr_blocks[_] == "0.0.0.0/0"
+#   r.type == "aws_instance"
+#   r.mode == "unmanaged"
 
 #   msg := sprintf(
-#     "Security group %s exposes SSH port 22 to 0.0.0.0/0. Restrict SSH to a trusted IP address.",
-#     [r.address]
+#     "Resource %s of type %s is unmanaged.",
+#     [r.address, r.type]
 #   )
 # }
 

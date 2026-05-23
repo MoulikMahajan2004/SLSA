@@ -2,7 +2,7 @@
 
 ## Zero-Trust CI/CD Security Architecture using GitHub Actions, GPG, OPA, Cosign, in-toto and AWS
 
-![Zero-Trust CI/CD Architecture] (Workflow-Mechanism/software delivery secure mechanism.png)
+![Zero-Trust CI/CD Architecture]
 <p align="center">
   <img src="./Workflow-Mechanism/software delivery secure mechanism.png" alt="Zero Trust CI/CD Architecture" width="1000"/>
 </p>
