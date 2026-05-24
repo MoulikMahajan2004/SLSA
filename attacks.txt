@@ -1,0 +1,6 @@
+resources
+
+person commitng - (GPG)
+TF protection-(REGO)
+BUILD FILE - Cosing
+pipeline steps-(INTOTO)
